@@ -30,12 +30,14 @@ public class Main {
 
         System.out.println("The End.");
     }
+
     static void getSumInThreads(int arrSize, int numTreads, int[] data) {
+        int sum = 0;
         Lock mutex = new ReentrantLock();
         Thread[] threads = new Thread[numTreads];
         int numElementsInArr = arrSize / numTreads;
         int rem = arrSize % numTreads;
-        SumThread []arrSum = new SumThread[numElementsInArr];
+        SumThread[] arrSum = new SumThread[numElementsInArr];
 
         for (int i = 0; i < numTreads; i++) {
             int start = i * numElementsInArr;
@@ -48,7 +50,7 @@ public class Main {
         }
         for (int i = 0; i < rem; i++) {
             int index = arrSize - 1 - i;
-            finalSum =finalSum+ data[index];
+            sum = sum + data[index];
         }
         for (int i = 0; i < numTreads; i++) {
             try {
@@ -57,7 +59,8 @@ public class Main {
                 e.printStackTrace();
             }
         }
-        System.out.println("sum = "+finalSum);
+        finalSum = finalSum + sum;
+        System.out.println("sum = " + finalSum);
     }
 }
 
@@ -78,21 +81,15 @@ class SumThread implements Runnable {
     @Override
     public void run() {
         for (int i = start; i < end; i++) {
-            sum = sum+ data[i];
+            sum = sum + data[i];
         }
         mutex.lock();
-        try{
-            Main.finalSum =Main.finalSum + sum;
+        try {
+            Main.finalSum = Main.finalSum + sum;
             System.out.println(Thread.currentThread().getId() + ": my sum " + sum);
         } finally {
             mutex.unlock();
         }
-        try {
-            Thread.sleep(Main.random.nextInt(100));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
     }
 
 }
